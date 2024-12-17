@@ -22,7 +22,7 @@ public class MessageService {
     public Message createMessage(Message message){
         if((message.getMessageText().isBlank()) || (message.getMessageText() == null) || 
         (message.getMessageText().length() > 255) || 
-        (accountRepository.findByUsername(message.getPostedBy().toString()) == null)){
+        (accountRepository.findAccountByAccountId(message.getPostedBy()) == null)){
             return null;
         }
         return messageRepository.save(message);
@@ -37,6 +37,23 @@ public class MessageService {
     }
 
     public Integer deleteMessageById(Integer id){
-        return messageRepository.deleteMessageById(id);
+        if(messageRepository.findMessageById(id) != null){
+            messageRepository.deleteById(id);
+            return 1;
+        }
+        return 0;
+    }
+
+    public Integer updateMessageById(Integer id, Message message){
+        if((messageRepository.findMessageById(id) != null) && (!message.getMessageText().isBlank()) &&
+        (message.getMessageText() != null) && (message.getMessageText().length() <= 255)){
+            messageRepository.updateMessageById(message.getMessageText(), id);
+            return 1;
+        }
+        return 0;
+    }
+
+    public List<Message> getMessagesByUserId(Integer userId){
+        return messageRepository.findMessageByUserId(userId);
     }
 }
